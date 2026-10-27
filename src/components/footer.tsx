@@ -120,12 +120,12 @@ export function Footer() {
             <ul className="space-y-2 text-xs text-slate-400 font-light">
               <li>786 901 1622</li>
               <li>
-                <a
+                <Link
                   href="mailto:info@wandarland.com"
                   className="hover:text-white transition-colors"
                 >
                   info@wandarland.com
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

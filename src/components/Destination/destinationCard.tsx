@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MapPin, Calendar, Star, ArrowUpRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export interface Destination {
   id?: string | number;
@@ -24,20 +25,21 @@ interface DestinationCardProps {
 
 export function DestinationCard({
   destination,
-  onBookNow,
 }: DestinationCardProps) {
   const { id, _id, title, country, duration, price, rating = 4.5, imageUrl } = destination;
   const cardId = id || _id || "";
 
   return (
+    <Link href={`http://localhost:3000/destinations/${cardId}`}>
     <Card className="border-none shadow-none bg-transparent group cursor-pointer w-full">
       <CardContent className="p-0">
         {/* Image Container */}
-        <div className="relative h-64 sm:h-72 w-full rounded-none overflow-hidden mb-4 bg-slate-100">
+        <div className="relative h-64 sm:h-72 w-full rounded-md overflow-hidden mb-4 bg-slate-100">
           <Image
             src={imageUrl || "https://images.unsplash.com/photo-1540206395-68808572332f"}
             alt={title}
-            fill
+            height={500}
+            width={400}
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
           {/* Rating Badge */}
@@ -48,7 +50,7 @@ export function DestinationCard({
         </div>
 
         {/* Details Section */}
-        <div className="space-y-2">
+        <div className="space-y-2 m-4">
           <div className="flex items-center text-xs text-slate-500 gap-1 font-medium">
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
             <span>{country}</span>
@@ -74,16 +76,16 @@ export function DestinationCard({
           </div>
 
           <div className="pt-2">
-            <button
-              onClick={() => onBookNow?.(cardId)}
+            <span
               className="inline-flex items-center text-xs font-bold text-sky-400 hover:text-sky-500 uppercase tracking-wider gap-0.5 transition-colors"
             >
               Book Now
               <ArrowUpRight className="h-4 w-4" />
-            </button>
+            </span>
           </div>
         </div>
       </CardContent>
     </Card>
+    </Link>
   );
 }

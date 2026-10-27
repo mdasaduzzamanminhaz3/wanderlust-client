@@ -6,14 +6,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Destination, DestinationCard } from "@/components/destinationCard";
+import { Destination, DestinationCard } from "@/components/Destination/destinationCard";
 
 export default async function AllDestinationsPage() {
   let destinations: Destination[] = [];
   let errorMessage = "";
 
   try {
-    const res = await fetch("http://localhost:8000/destinatios", {
+    const res = await fetch("http://localhost:8000/destinations", {
       cache: "no-store", // Ensures fresh data fetches
     });
 

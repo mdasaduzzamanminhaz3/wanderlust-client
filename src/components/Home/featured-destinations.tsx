@@ -12,7 +12,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { DestinationCard, Destination } from "../destinationCard";
+import { DestinationCard, Destination } from "../Destination/destinationCard";
 
 export default function FeaturedDestinations() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
@@ -28,7 +28,7 @@ export default function FeaturedDestinations() {
     const fetchDestinations = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:8000/destinatios");
+        const res = await fetch("http://localhost:8000/destinations");
         
         if (!res.ok) {
           throw new Error("Failed to fetch featured destinations");
@@ -36,7 +36,7 @@ export default function FeaturedDestinations() {
 
         const data = await res.json();
         setDestinations(data);
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error fetching destinations:", err);
         setError("Could not load destinations.");
       } finally {
@@ -47,16 +47,25 @@ export default function FeaturedDestinations() {
     fetchDestinations();
   }, []);
 
-  // Handle Carousel API state
+// Handle Carousel API state
   useEffect(() => {
     if (!api) return;
 
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on("select", () => {
+    // সরাসরি স্টেট সিঙ্ক করার বদলে রেন্ডার সাইকেলের বাইরে হ্যান্ডেল করা
+    const updateState = () => {
       setCurrent(api.selectedScrollSnap() + 1);
-    });
+      setCount(api.scrollSnapList().length);
+    };
+
+    updateState();
+
+    api.on("select", updateState);
+    api.on("reInit", updateState);
+
+    return () => {
+      api.off("select", updateState);
+      api.off("reInit", updateState);
+    };
   }, [api, destinations]);
 
   return (
@@ -126,7 +135,7 @@ export default function FeaturedDestinations() {
             <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100">
               {/* Slide Indicator & Progress Line */}
               <div className="flex items-center gap-4 flex-1 max-w-2xl">
-                <span className="text-sm font-semibold text-slate-700 min-w-[3rem]">
+                <span className="text-sm font-semibold text-slate-700 min-w-12">
                   {current}/{count || destinations.length}
                 </span>
                 <div className="h-[1.5px] bg-slate-200 flex-1 relative overflow-hidden">
