@@ -5,6 +5,17 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, UserRound, X } from "lucide-react";
 import { cn } from "cn";
+import { authClient } from "@/lib/auth-client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const primaryLinks = [
   { href: "/", label: "Home" },
@@ -16,14 +27,20 @@ const primaryLinks = [
 
 const authLinks = [
   { href: "/profile", label: "Profile" },
-  { href: "/login", label: "Login" },
-  { href: "/sign-up", label: "Sign Up" },
+  { href: "/signin", label: "Login" },
+  { href: "/signup", label: "Sign Up" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  console.log(user);
+  const handleSignOut = () => {
+    authClient.signOut();
+  };
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 shadow-sm backdrop-blur-md">
       <nav
@@ -60,31 +77,77 @@ export function Navbar() {
 
         {/* Right: account links (desktop) + hamburger (mobile) */}
         <div className="flex flex-1 items-center justify-end gap-5">
-          <Link
-            href="/profile"
-            className="hidden text-sm font-medium text-foreground transition-colors hover:text-primary md:inline-flex md:items-center md:gap-1.5"
-          >
-            <UserRound className="size-4" aria-hidden="true" /> Profile
-          </Link>
-          <Link
-            href="/login"
-            className="hidden text-sm font-medium text-foreground transition-colors hover:text-primary md:inline-block"
-          >
-            Login
-          </Link>
-          <Link
-            href="/sign-up"
-            className="hidden h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/80 md:inline-flex"
-          >
-            Sign Up
-          </Link>
+          {user ? (
+            <Popover>
+              <PopoverTrigger
+                render={
+                  <button
+                    type="button"
+                    aria-label="Open user menu"
+                    className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <Avatar>
+                      <AvatarImage
+                        referrerPolicy="no-referrer"
+                        src={user?.image ?? undefined}
+                        alt={user?.name ?? "User"}
+                      />
+                      <AvatarFallback>
+                        {user?.name?.charAt(0)?.toUpperCase() ?? "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                }
+              />
+
+              <PopoverContent align="start">
+                <PopoverHeader>
+                  <PopoverTitle>{user?.name}</PopoverTitle>
+
+                  <PopoverDescription>{user?.email}</PopoverDescription>
+                </PopoverHeader>
+
+                <div className="flex flex-col gap-2 px-4 py-3">
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
+                  >
+                    <UserRound className="size-4" aria-hidden="true" />
+                    Profile
+                  </Link>
+
+                  <Button onClick={handleSignOut} variant="destructive">
+                    Sign Out
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <>
+              <Link
+                href="/signIn"
+                className="hidden text-sm font-medium text-foreground transition-colors hover:text-primary md:inline-block"
+              >
+                Login
+              </Link>
+              <Link
+                href="/signup"
+                className="hidden h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/80 md:inline-flex"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
+
           <button
             type="button"
             className="rounded-md p-2 text-foreground transition-colors hover:text-primary md:hidden"
             onClick={() => setMenuOpen((open) => !open)}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              menuOpen ? "Close navigation menu" : "Open navigation menu"
+            }
           >
             {menuOpen ? (
               <X className="size-5" aria-hidden="true" />
