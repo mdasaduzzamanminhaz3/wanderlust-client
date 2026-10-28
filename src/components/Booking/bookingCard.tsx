@@ -13,7 +13,6 @@ import {
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'react-toastify';
 interface DestinationDetail {
-  id?: string;
   _id?: string;
   title: string;
   country: string;
@@ -30,35 +29,47 @@ interface DestinationDetail {
 const BookingCard = ({dData}:{dData:DestinationDetail}) => {
     const {data: session} = authClient.useSession();
     const user = session?.user;
-    const handleBooking = async(e) => {
-        e.preventDefault();
-       
-        const departureDate = e.target.departureDate.value;
-        const data ={
-            username:user?.name,
-            email:user?.email,
-            image:user?.image,
-            ...dData,
-            departureDate:departureDate,
-            bookingDate: new Date()
-
-        }
-        
-        const res = await fetch('http://localhost:8000/booking',{
-            method:"POST",
-            headers:{
-                'Content-Type':'application/json'
+const handleBooking = async(e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const form = e.currentTarget;
+    const departureDate = (form.elements.namedItem("departureDate") as HTMLInputElement)?.value;
+    
+    const data = {
+        username: user?.name,
+        email: user?.email,
+        image: user?.image,
+        title: dData.title,
+        country: dData.country,
+        price: dData.price,
+        duration: dData.duration,
+        imageUrl: dData.imageUrl,
+        description: dData.description,
+        destinationId: dData._id, 
+        departureDate: departureDate,
+        bookingDate: new Date(),
+        status: "Confirmed" 
+    };
+    
+    try {
+        const res = await fetch('http://localhost:8000/booking', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-        })
+        });
         const bookingResponse = await res.json();
-        if(res){
-
-            toast.success("Booking successfully")
+        
+        if(res.ok) {
+            toast.success("Booking successfully!");
+            console.log(bookingResponse);
         }
-        console.log(bookingResponse);
-
+    } catch (error) {
+        console.error("Booking error:", error);
+        toast.error("Failed to book destination.");
     }
+}
     return (
           <div className="lg:col-span-1">
             <Card className="border border-slate-200/80 shadow-lg rounded-xl bg-white sticky top-6">
