@@ -52,7 +52,7 @@ const handleBooking = async(e: React.FormEvent<HTMLFormElement>) => {
     };
     
     try {
-        const res = await fetch('http://localhost:8000/booking', {
+        const res = await fetch(`${process.env.BACKEND_URL}/booking`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'

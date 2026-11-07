@@ -77,7 +77,7 @@ export function EditDestinationDialog({
     }
 
     const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      process.env.NEXT_PUBLIC_API_URL || `${process.env.BACKEND_URL}`;
 
     setIsSubmitting(true);
 

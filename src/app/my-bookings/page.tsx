@@ -11,6 +11,7 @@ export interface Booking {
   _id?: string;
   title: string;
   destinationName?: string;
+  destinationId: string;
   departureDate: string;
   bookingId: string;
   price: number;
@@ -32,7 +33,7 @@ export default async function MyBookings() {
     // ইউজার ইমেইল না থাকলে ফলব্যাক বা এম্টি রাখা যেতে পারে
     const userEmail = user?.email || "test@example.com";
 
-    const res = await fetch(`http://localhost:8000/my-bookings/${userEmail}`, {
+    const res = await fetch(`${process.env.BACKEND_URL}/my-bookings/${userEmail}`, {
       cache: "no-store",
     });
 

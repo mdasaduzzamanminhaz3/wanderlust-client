@@ -13,7 +13,7 @@ export default async function AllDestinationsPage() {
   let errorMessage = "";
 
   try {
-    const res = await fetch("http://localhost:8000/destinations", {
+    const res = await fetch(`${process.env.BACKEND_URL}/destinations`, {
       cache: "no-store", // Ensures fresh data fetches
     });
 

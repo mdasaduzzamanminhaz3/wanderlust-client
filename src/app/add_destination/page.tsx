@@ -13,7 +13,6 @@ import {
   FileText,
   XCircle,
   PlusCircle,
-  Sparkles,
   CheckCircle2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,11 +50,15 @@ export default function AddDestinationPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, category: value }));
+  // Fix applied here: accept string or handle null safely
+  const handleSelectChange = (value: string | null) => {
+    if (value) {
+      setFormData((prev) => ({ ...prev, category: value }));
+    }
   };
 
-  const handleReset = () => {
+  const handleReset = (e: React.MouseEvent) => {
+    e.preventDefault();
     setFormData({
       title: "",
       country: "",
@@ -70,28 +73,34 @@ export default function AddDestinationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res =await fetch('http://localhost:8000/add-destination',{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json',
-        },
-        body:JSON.stringify(formData)
-    })
-    const data = await res.json();
-    console.log(data);
     setLoading(true);
-    
-    // Simulate API request
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    toast.success(`Your destination added successfully.`)
 
-    setLoading(false);
-    setSuccess(true);
+    try {
+      const res = await fetch(`${process.env.BACKEND_URL}/add-destination`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      console.log(data);
 
-    setTimeout(() => setSuccess(false), 4000);
+      // Simulate API response delay or success
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      toast.success(`Your destination added successfully.`);
 
-
-
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 4000);
+      
+      // Optionally reset form after success
+      // handleReset(e as any);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add destination.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -155,7 +164,7 @@ export default function AddDestinationPage() {
                   />
                 </div>
 
-                {/* 2. Country & Category (Two columns on sm screen) */}
+                {/* 2. Country & Category */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Country */}
                   <div className="space-y-2">
@@ -203,7 +212,7 @@ export default function AddDestinationPage() {
                   </div>
                 </div>
 
-                {/* 3. Price & Duration (Two columns on sm screen) */}
+                {/* 3. Price & Duration */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Price */}
                   <div className="space-y-2">
@@ -314,7 +323,7 @@ export default function AddDestinationPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-slate-100">
                   {/* Cancel Button */}
                   <Button
-                    type="submit"
+                    type="button"
                     variant="outline"
                     onClick={handleReset}
                     className="w-full sm:w-auto border-rose-300 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-md h-11 px-6 text-xs font-semibold tracking-wider transition-all uppercase flex items-center justify-center gap-2"

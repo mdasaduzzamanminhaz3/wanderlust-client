@@ -41,7 +41,7 @@ export default async function DestinationsDetailsPage({ params }: PageProps) {
   let destination: DestinationDetail | null = null;
   let errorMessage = "";
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || `${process.env.BACKEND_URL}`;
 
   try {
     const res = await fetch(`${apiUrl}/destination/${id}`, {

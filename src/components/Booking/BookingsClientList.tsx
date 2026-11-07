@@ -28,7 +28,7 @@ export default function BookingsClientList({ bookings: initialBookings }: Bookin
       setDeletingId(bookingMongoId);
       
     
-      const res = await fetch(`http://localhost:8000/my-bookings/${bookingMongoId}`, {
+      const res = await fetch(`${process.env.BACKEND_URL}/my-bookings/${bookingMongoId}`, {
         method: "DELETE",
       });
 

@@ -28,7 +28,7 @@ export default function FeaturedDestinations() {
     const fetchDestinations = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:8000/destinations");
+        const res = await fetch(`${process.env.BACKEND_URL}/destinations`);
         
         if (!res.ok) {
           throw new Error("Failed to fetch featured destinations");
